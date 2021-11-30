@@ -22,6 +22,7 @@ pub mod histogram;
 pub mod ohlc;
 pub mod scatter;
 pub mod surface;
+pub mod scatter3d;
 
 pub use crate::layout::Layout;
 pub use crate::plot::ImageFormat;
@@ -36,7 +37,7 @@ pub use crate::histogram::Histogram;
 pub use crate::ohlc::Ohlc;
 pub use crate::scatter::Scatter;
 pub use crate::surface::Surface;
-
+pub use crate::scatter3d::Scatter3D;
 pub use crate::common::color::NamedColor;
 pub use crate::common::color::Rgb;
 pub use crate::common::color::Rgba;
