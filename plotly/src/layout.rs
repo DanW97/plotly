@@ -2410,12 +2410,12 @@ impl Layout {
         self
     }
     
-    pub fn scale_anchor(mut self, anchor: Axis) -> Axis{
+    pub fn scale_anchor(mut self, anchor: Axis) -> Layout{
         self.scale_anchor = Some(anchor);
         self
     }
     
-    pub fn scale_ratio(mut self, ratio: f64) -> Axis{
+    pub fn scale_ratio(mut self, ratio: f64) -> Layout{
         self.scale_ratio = Some(ratio);
         self
     }
