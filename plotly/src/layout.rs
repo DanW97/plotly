@@ -832,13 +832,27 @@ pub struct Axis {
     range_selector: Option<RangeSelector>,
     #[serde(skip_serializing_if = "Option::is_none")]
     calendar: Option<Calendar>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "scaleanchor")]
+    scale_anchor: Option<Axis>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "scaleratio")]
+    scale_ratio: Option<f64>,
 }
 
 impl Axis {
     pub fn new() -> Axis {
         Default::default()
     }
-
+    
+    pub fn scale_anchor(mut self, anchor: Axis) -> Axis{
+        self.scale_anchor = Some(anchor);
+        self
+    }
+    
+    pub fn scale_ratio(mut self, ratio: f64) -> Axis{
+        self.scale_ratio = Some(ratio);
+        self
+    }
+    
     pub fn visible(mut self, visible: bool) -> Axis {
         self.visible = Some(visible);
         self
