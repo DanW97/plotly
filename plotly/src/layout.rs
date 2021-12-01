@@ -2341,7 +2341,7 @@ pub struct Layout {
     #[serde(skip_serializing_if = "Option::is_none", rename = "yaxis8")]
     y_axis8: Option<Axis>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "scaleanchor")]
-    scale_anchor: Option<Axis>,
+    scale_anchor: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "scaleratio")]
     scale_ratio: Option<f64>,
     // ternary: Option<LayoutTernary>,
@@ -2410,7 +2410,7 @@ impl Layout {
         self
     }
     
-    pub fn scale_anchor(mut self, anchor: Axis) -> Layout{
+    pub fn scale_anchor(mut self, anchor: String) -> Layout{
         self.scale_anchor = Some(anchor);
         self
     }
