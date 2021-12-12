@@ -166,6 +166,8 @@ pub enum PlotType {
     ScatterGL,
     #[serde(rename = "scatter3d")]
     Scatter3D,
+    #[serde(rename = "cone")]
+    Cone,
     #[serde(rename = "bar")]
     Bar,
     #[serde(rename = "box")]
