@@ -72,7 +72,8 @@ where
 
     #[serde(skip_serializing_if = "Option::is_none")]
     z: Option<Vec<Z>>,
-
+    #[serde(skip_serializing_if = "Option::is_none", rename = "showscale")]
+    show_scale: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     z0: Option<NumOrStringWrapper>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -183,6 +184,7 @@ where
             v: None,
             w: None,
             anchor: None,
+            show_scale: None,
             text: None,
             text_position: None,
             text_template: None,
@@ -366,7 +368,13 @@ where
         self.show_legend = Some(show_legend);
         Box::new(self)
     }
-
+    
+    /// Determines whether or not the colorbar is shown
+    pub fn show_scale(mut self, show_scale: bool) -> Box<Self> {
+        self.show_scale = Some(show_scale);
+        Box::new(self)
+    }
+    
     /// Sets the legend group for this trace. Traces part of the same legend group hide/show at the
     /// same time when toggling legend items.
     pub fn legend_group(mut self, legend_group: &str) -> Box<Self> {
