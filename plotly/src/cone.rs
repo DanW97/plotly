@@ -18,6 +18,18 @@ use ndarray::{Array, Ix1, Ix2, Ix3};
 use crate::ndarray::ArrayTraces;
 
 #[derive(Serialize, Clone, Debug)]
+pub enum Anchor{
+    #[serde(rename = "tip")]
+    Tip,
+    #[serde(rename = "tail")]
+    Tail,
+    #[serde(rename = "cm")]
+    CM,
+    #[serde(rename = "center")]
+    Center,
+}
+
+#[derive(Serialize, Clone, Debug)]
 pub struct Cone<X, Y, Z, U, V, W>
 where
     X: Serialize + Clone + 'static,
@@ -65,6 +77,9 @@ where
     z0: Option<NumOrStringWrapper>,
     #[serde(skip_serializing_if = "Option::is_none")]
     dz: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    anchor: Option<Anchor>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     text: Option<Dim<String>>,
@@ -167,6 +182,7 @@ where
             u: None,
             v: None,
             w: None,
+            anchor: None,
             text: None,
             text_position: None,
             text_template: None,
@@ -742,6 +758,12 @@ where
     /// Sets the calendar system to use with `z` date data.
     pub fn z_calendar(mut self, z_calendar: Calendar) -> Box<Self> {
         self.z_calendar = Some(z_calendar);
+        Box::new(self)
+    }
+
+    /// Sets the anchor for the cone with respect to input x, y, z coordinates
+    pub fn anchor(mut self, anchor: Anchor) -> Box<Self> {
+        self.anchor = Some(anchor);
         Box::new(self)
     }
 }
