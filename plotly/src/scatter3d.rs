@@ -1,4 +1,4 @@
-//! Scatter plot
+//! 3D Scatter plot
 
 use crate::common::color::{Color, ColorWrapper};
 use crate::common::{
@@ -212,7 +212,7 @@ where
 
     #[cfg(feature = "plotly_ndarray")]
     pub fn from_array(x: Array<X, Ix1>, y: Array<Y, Ix1>, z: Array<Z, Ix1>) -> Box<Self> {
-        Box::new(Scatter {
+        Box::new(Scatter3D {
             x: Some(x.to_vec()),
             y: Some(y.to_vec()),
             z: Some(z.to_vec()),

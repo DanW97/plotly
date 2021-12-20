@@ -22,9 +22,9 @@ fn simple_cone_plot() {
 }
 
 fn simple_color_scatter() {
-    let x = vec![0.,1.];
-    let y = vec![1.,0.];
-    let arr = vec![0.1,0.3];
+    let x = vec![0.];
+    let y = vec![1.];
+    let arr = vec![0.1];
     let trace = Scatter::new(x,y)
                         .mode(Mode::Markers)
                         .marker(Marker::new()
@@ -33,6 +33,17 @@ fn simple_color_scatter() {
                                     .color_array(arr)
                                     .color_bar(ColorBar::new()));
     let mut plot = Plot::new();
+    plot.add_trace(trace);
+    let x = vec![0.];
+    let y = vec![1.3];
+    let arr = vec![1.];
+    let trace = Scatter::new(x,y)
+                        .mode(Mode::Markers)
+                        .marker(Marker::new()
+                                    .cauto(true)
+                                    .color_scale(ColorScale::Palette(ColorScalePalette::Viridis))
+                                    .color_array(arr)
+                                    .color_bar(ColorBar::new()));
     plot.add_trace(trace);
     plot.use_local_plotly();
     plot.show();
