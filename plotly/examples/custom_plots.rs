@@ -1,6 +1,6 @@
 use itertools_num::linspace;
 use plotly::common::{
-    ColorScale, ColorScalePalette, DashType, Fill, Font, Line, LineShape, Marker, Mode, Title,
+    ColorScale, ColorScalePalette, DashType, Fill, Font, Line, LineShape, Marker, Mode, Title, ColorBar,
 };
 use plotly::cone::Anchor;
 use plotly::layout::{Axis, BarMode, Layout, Legend, TicksDirection};
@@ -21,6 +21,23 @@ fn simple_cone_plot() {
     plot.show();
 }
 
+fn simple_color_scatter() {
+    let x = vec![0.,1.];
+    let y = vec![1.,0.];
+    let arr = vec![0.1,0.3];
+    let trace = Scatter::new(x,y)
+                        .mode(Mode::Markers)
+                        .marker(Marker::new()
+                                    .cauto(true)
+                                    .color_scale(ColorScale::Palette(ColorScalePalette::Viridis))
+                                    .color_array(arr)
+                                    .color_bar(ColorBar::new()));
+    let mut plot = Plot::new();
+    plot.add_trace(trace);
+    plot.use_local_plotly();
+    plot.show();
+}
+
 fn main(){
-    simple_cone_plot();
+    simple_color_scatter();
 }
