@@ -927,12 +927,6 @@ pub struct ColorBar {
     title: Option<Title>,
 }
 
-impl Default for ColorBar {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ColorBar {
     pub fn new() -> ColorBar {
         ColorBar {
@@ -951,7 +945,29 @@ impl ColorBar {
             tick_width: 1,
             show_tick_labels: true,
             separate_thousands: true,
-            ..Default::default()
+            thickness_mode: None,
+            len_mode: None,
+            outline_color: None,
+            border_color: None,
+            background_color: None,
+            tick_mode: None,
+            tick0: None,
+            dtick: None,
+            tick_vals: None,
+            tick_text: None,
+            ticks: None,
+            tick_color: None,
+            tick_font: None,
+            tick_angle: None,
+            tick_format: None,
+            tick_format_stops: None,
+            tick_prefix: None,
+            show_tick_prefix: None,
+            tick_suffix: None,
+            show_tick_suffix: None,
+            exponent_format: None,
+            show_exponent: None,
+            title: None,
         }
     }
 
