@@ -37,6 +37,7 @@ fn simple_color_scatter() {
     let x = vec![0.];
     let y = vec![1.3];
     let arr = vec![1.];
+    let layout = Layout::new();
     let trace = Scatter::new(x,y)
                         .mode(Mode::Markers)
                         .marker(Marker::new()
@@ -45,6 +46,7 @@ fn simple_color_scatter() {
                                     .color_array(arr)
                                     .color_bar(ColorBar::new()));
     plot.add_trace(trace);
+    plot.set_layout(layout);
     plot.use_local_plotly();
     plot.show();
 }
