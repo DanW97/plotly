@@ -1,10 +1,12 @@
+use std::default;
+
 use crate::common::color::{Color, ColorWrapper};
 use crate::common::{
     Anchor, Calendar, ColorBar, ColorScale, DashType, Font, Label, Orientation, Side,
     TickFormatStop, TickMode, Title,
 };
 use crate::plot::Trace;
-use crate::private;
+use crate::{private, NamedColor};
 use crate::private::{to_num_or_string_wrapper, NumOrString, NumOrStringWrapper, TruthyEnum};
 use serde::Serialize;
 
@@ -2412,7 +2414,19 @@ pub struct Layout {
 
 impl Layout {
     pub fn new() -> Layout {
-        Default::default()
+        Layout{plot_background_color: Some("#e5ecf6".to_color()),
+        x_axis: Some(Axis::new().line_color(NamedColor::White)
+                            .grid_color(NamedColor::White)
+                            .auto_margin(true)
+                        .zero_line_color(NamedColor::White)
+                        .zero_line_width(2)),
+        y_axis: Some(Axis::new().line_color(NamedColor::White)
+                        .grid_color(NamedColor::White)
+                        .auto_margin(true)
+                    .zero_line_color(NamedColor::White)
+                    .zero_line_width(2)),
+        ..Default::default()
+        }
     }
 
     pub fn title(mut self, title: Title) -> Layout {
