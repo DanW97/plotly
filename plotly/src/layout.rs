@@ -1,3 +1,4 @@
+use std::collections::hash_map::RandomState;
 use std::default;
 
 use crate::common::color::{Color, ColorWrapper};
@@ -851,6 +852,7 @@ impl Axis {
             zero_line_color: Some(ColorWrapper::S("White".to_string())),
             zero_line_width: Some(2),
             title: Some(Title::new("".into())),
+            range_mode: Some(RangeMode::Normal),
             ..Default::default()
         }
     }
