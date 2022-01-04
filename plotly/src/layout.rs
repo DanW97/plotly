@@ -66,6 +66,8 @@ pub enum TicksDirection {
     Outside,
     #[serde(rename = "inside")]
     Inside,
+    #[serde(rename = "")]
+    None,
 }
 
 #[derive(Serialize, Debug)]
@@ -848,6 +850,7 @@ impl Axis {
             auto_margin: Some(true),
             zero_line_color: Some(ColorWrapper::S("White".to_string())),
             zero_line_width: Some(2),
+            title: Some(Title::new("".into())),
             ..Default::default()
         }
     }
@@ -1172,6 +1175,7 @@ impl Axis {
         self.calendar = Some(calendar);
         self
     }
+
 }
 
 #[derive(Serialize, Debug)]

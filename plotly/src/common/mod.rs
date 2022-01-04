@@ -1410,6 +1410,8 @@ pub struct Title {
     y_anchor: Option<Anchor>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pad: Option<Pad>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "standoff")]
+    stand_off: Option<usize>,
 }
 
 impl From<&str> for Title {
@@ -1470,6 +1472,12 @@ impl Title {
         self.pad = Some(pad);
         self
     }
+
+    pub fn stand_off(mut self, stand_off: usize) -> Title {
+        self.stand_off = Some(stand_off);
+        self
+    }
+
 }
 
 #[derive(Serialize, Clone, Debug, Default)]
