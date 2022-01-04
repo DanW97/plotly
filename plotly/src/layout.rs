@@ -842,7 +842,14 @@ pub struct Axis {
 
 impl Axis {
     pub fn new() -> Axis {
-        Default::default()
+        Axis{
+            line_color: Some(ColorWrapper::S("White".to_string())),
+            grid_color: Some(ColorWrapper::S("White".to_string())),
+            auto_margin: Some(true),
+            zero_line_color: Some(ColorWrapper::S("White".to_string())),
+            zero_line_width: Some(2),
+            ..Default::default()
+        }
     }
     
     pub fn visible(mut self, visible: bool) -> Axis {
@@ -2415,16 +2422,8 @@ pub struct Layout {
 impl Layout {
     pub fn new() -> Layout {
         Layout{plot_background_color: Some("#e5ecf6".to_color()),
-        x_axis: Some(Axis::new().line_color(NamedColor::White)
-                            .grid_color(NamedColor::White)
-                            .auto_margin(true)
-                        .zero_line_color(NamedColor::White)
-                        .zero_line_width(2)),
-        y_axis: Some(Axis::new().line_color(NamedColor::White)
-                        .grid_color(NamedColor::White)
-                        .auto_margin(true)
-                    .zero_line_color(NamedColor::White)
-                    .zero_line_width(2)),
+        x_axis: Some(Axis::new()),
+        y_axis: Some(Axis::new()),
         ..Default::default()
         }
     }
