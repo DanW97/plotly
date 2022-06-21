@@ -552,6 +552,11 @@ pub enum DashType {
 
 #[derive(Serialize, Clone, Debug)]
 pub struct ColorScaleElement(f64, String);
+impl ColorScaleElement{
+    pub fn new(c: f64, s: String) -> ColorScaleElement{
+        ColorScaleElement(c, s)
+    }
+}
 
 #[derive(Serialize, Clone, Debug)]
 pub enum ColorScalePalette {
