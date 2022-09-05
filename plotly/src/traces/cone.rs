@@ -4,18 +4,14 @@
 use ndarray::{Array, Ix1};
 use serde::Serialize;
 
-use crate::common::color::{Color, ColorWrapper};
+use crate::Trace;
+use crate::common::color::Color;
 use crate::common::{
-    Calendar, Dim, ErrorData, Fill, Font, GroupNorm, HoverInfo, Label, Line, Marker, Mode,
+    Calendar, Dim, ErrorData, Fill, Font, HoverInfo, Label, Line, Marker, Mode,
     Orientation, PlotType, Position, Visible,
 };
-use crate::private;
-use crate::Trace;
-use serde::Serialize;
 
-use crate::private::{
-    copy_iterable_to_vec, to_num_or_string_wrapper, NumOrString, NumOrStringWrapper, TruthyEnum,
-};
+use crate::private;
 #[cfg(feature = "plotly_ndarray")]
 use ndarray::{Array, Ix1, Ix2, Ix3};
 #[cfg(feature = "plotly_ndarray")]
@@ -33,137 +29,108 @@ pub enum Anchor{
     Center,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[serde_with::skip_serializing_none]
+#[derive(Serialize, Debug, Clone)]
 pub struct Cone<X, Y, Z, U, V, W>
 where
-    X: Serialize + Clone + 'static,
-    Y: Serialize + Clone + 'static,
-    Z: Serialize + Clone + 'static,
-    U: Serialize + Clone + 'static,
-    V: Serialize + Clone + 'static,
-    W: Serialize + Clone + 'static,
+    X: Serialize + Clone,
+    Y: Serialize + Clone,
+    Z: Serialize + Clone,
+    U: Serialize + Clone,
+    V: Serialize + Clone,
+    W: Serialize + Clone,
 {
     r#type: PlotType,
-    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    visible: Option<TruthyEnum<Visible>>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "showlegend")]
+    visible: Option<Visible>,
+    #[serde(rename = "showlegend")]
     show_legend: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "legendgroup")]
+    #[serde(rename = "legendgroup")]
     legend_group: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     opacity: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     mode: Option<Mode>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     ids: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     x: Option<Vec<X>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    x0: Option<NumOrStringWrapper>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    x0: Option<private::NumOrString>,
     dx: Option<f64>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     y: Option<Vec<Y>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    y0: Option<NumOrStringWrapper>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    y0: Option<private::NumOrString>,
     dy: Option<f64>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     z: Option<Vec<Z>>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "showscale")]
+    #[serde(rename = "showscale")]
     show_scale: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    z0: Option<NumOrStringWrapper>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    z0: Option<private::NumOrString>,
     dz: Option<f64>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     anchor: Option<Anchor>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     text: Option<Dim<String>>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "textposition")]
+    #[serde(rename = "textposition")]
     text_position: Option<Dim<Position>>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "texttemplate")]
+    #[serde(rename = "texttemplate")]
     text_template: Option<Dim<String>>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "hovertext")]
+    #[serde(rename = "hovertext")]
     hover_text: Option<Dim<String>>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "hoverinfo")]
+    #[serde(rename = "hoverinfo")]
     hover_info: Option<HoverInfo>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "hovertemplate")]
+    #[serde(rename = "hovertemplate")]
     hover_template: Option<Dim<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    meta: Option<NumOrStringWrapper>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_data: Option<Vec<NumOrStringWrapper>>,
+    meta: Option<private::NumOrString>,
+    custom_data: Option<private::NumOrStringCollection>,
 
-    #[serde(skip_serializing_if = "Option::is_none", rename = "xaxis")]
+    #[serde(rename = "xaxis")]
     x_axis: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "yaxis")]
+    #[serde(rename = "yaxis")]
     y_axis: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "zaxis")]
+    #[serde(rename = "zaxis")]
     z_axis: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     orientation: Option<Orientation>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "groupnorm")]
-    group_norm: Option<GroupNorm>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "stackgroup")]
+    #[serde(rename = "stackgroup")]
     stack_group: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     marker: Option<Marker>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     line: Option<Line>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "textfont")]
+    #[serde(rename = "textfont")]
     text_font: Option<Font>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     error_x: Option<ErrorData>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     error_y: Option<ErrorData>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     error_z: Option<ErrorData>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "cliponaxis")]
+    #[serde(rename = "cliponaxis")]
     clip_on_axis: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "connectgaps")]
+    #[serde(rename = "connectgaps")]
     connect_gaps: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     fill: Option<Fill>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "fillcolor")]
-    fill_color: Option<ColorWrapper>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "hoverlabel")]
+    #[serde(rename = "fillcolor")]
+    fill_color: Option<Box<dyn Color>>,
+    #[serde(rename = "hoverlabel")]
     hover_label: Option<Label>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "hoveron")]
+    #[serde(rename = "hoveron")]
     hover_on: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "stackgaps")]
+    #[serde(rename = "stackgaps")]
     stack_gaps: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "xcalendar")]
+    #[serde(rename = "xcalendar")]
     x_calendar: Option<Calendar>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "ycalendar")]
+    #[serde(rename = "ycalendar")]
     y_calendar: Option<Calendar>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "zcalendar")]
+    #[serde(rename = "zcalendar")]
     z_calendar: Option<Calendar>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     u: Option<Vec<U>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     v: Option<Vec<V>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     w: Option<Vec<W>>,
 }
 
 impl<X, Y, Z, U, V, W> Default for Cone<X, Y, Z, U, V, W>
 where
-    X: Serialize + Clone + 'static,
-    Y: Serialize + Clone + 'static,
-    Z: Serialize + Clone + 'static,
-    U: Serialize + Clone + 'static,
-    V: Serialize + Clone + 'static,
-    W: Serialize + Clone + 'static,
+    X: Serialize + Clone,
+    Y: Serialize + Clone,
+    Z: Serialize + Clone,
+    U: Serialize + Clone,
+    V: Serialize + Clone,
+    W: Serialize + Clone,
 {
     fn default() -> Self {
         Cone {
@@ -201,7 +168,6 @@ where
             y_axis: None,
             z_axis: None,
             orientation: None,
-            group_norm: None,
             stack_group: None,
             marker: None,
             line: None,
@@ -225,49 +191,23 @@ where
 
 impl<X, Y, Z, U, V, W> Cone<X, Y, Z, U, V, W>
 where
-    X: Serialize + Clone + 'static,
-    Y: Serialize + Clone + 'static,
-    Z: Serialize + Clone + 'static,
-    U: Serialize + Clone + 'static,
-    V: Serialize + Clone + 'static,
-    W: Serialize + Clone + 'static,
+    X: Serialize + Clone,
+    Y: Serialize + Clone,
+    Z: Serialize + Clone,
+    U: Serialize + Clone,
+    V: Serialize + Clone,
+    W: Serialize + Clone,
 {
-    pub fn new<I, J, K, L, M, N>(x: I, y: J, z: K, u: L, v: M, w: N) -> Box<Self>
-    where
-        I: IntoIterator<Item = X>,
-        J: IntoIterator<Item = Y>,
-        K: IntoIterator<Item = Z>,
-        L: IntoIterator<Item = U>,
-        M: IntoIterator<Item = V>,
-        N: IntoIterator<Item = W>,
-    {
-        let x = copy_iterable_to_vec(x);
-        let y = copy_iterable_to_vec(y);
-        let z = copy_iterable_to_vec(z);
-        let u = copy_iterable_to_vec(u);
-        let v = copy_iterable_to_vec(v);
-        let w = copy_iterable_to_vec(w);
-        Box::new(Cone {
+    pub fn new(x: Vec<X>, y: Vec<Y>, z: Vec<Z>, u: Vec<U>, v: Vec<V>, w: Vec<W>) -> Box<Self> {
+        Box::new(Self {
             x: Some(x),
             y: Some(y),
             z: Some(z),
             u: Some(u),
             v: Some(v),
             w: Some(w),
-            r#type: PlotType::Cone,
             ..Default::default()
         })
-    }
-
-        
-    /// Enables WebGL.
-    pub fn web_gl_mode(mut self, on: bool) -> Box<Self> {
-        self.r#type = if on {
-            PlotType::ScatterGL
-        } else {
-            PlotType::Scatter
-        };
-        Box::new(self)
     }
 
     /// Sets the trace name. The trace name appear as the legend item and on hover.
@@ -279,7 +219,7 @@ where
     /// Determines whether or not this trace is visible. If `Visible::LegendOnly`, the trace is not
     /// drawn, but can appear as a legend item (provided that the legend itself is visible).
     pub fn visible(mut self, visible: Visible) -> Box<Self> {
-        self.visible = Some(TruthyEnum { e: visible });
+        self.visible = Some(visible);
         Box::new(self)
     }
 
@@ -327,8 +267,8 @@ where
 
     /// Alternate to `x`. Builds a linear space of x coordinates. Use with `dx` where `x0` is the
     /// starting coordinate and `dx` the step.
-    pub fn x0<C: NumOrString>(mut self, x0: C) -> Box<Self> {
-        self.x0 = Some(x0.to_num_or_string());
+    pub fn x0<C: Into<private::NumOrString>>(mut self, x0: C) -> Box<Self> {
+        self.x0 = Some(x0.into());
         Box::new(self)
     }
 
@@ -340,8 +280,8 @@ where
 
     /// Alternate to `y`. Builds a linear space of y coordinates. Use with `dy` where `y0` is the
     /// starting coordinate and `dy` the step.
-    pub fn y0<C: NumOrString>(mut self, y0: C) -> Box<Self> {
-        self.y0 = Some(y0.to_num_or_string());
+    pub fn y0<C: Into<private::NumOrString>>(mut self, y0: C) -> Box<Self> {
+        self.y0 = Some(y0.into());
         Box::new(self)
     }
 
@@ -353,8 +293,8 @@ where
 
     /// Alternate to `z`. Builds a linear space of z coordinates. Use with `dz` where `z0` is the
     /// starting coordinate and `dz` the step.
-    pub fn z0<C: NumOrString>(mut self, z0: C) -> Box<Self> {
-        self.z0 = Some(z0.to_num_or_string());
+    pub fn z0<C: Into<private::NumOrString>>(mut self, z0: C) -> Box<Self> {
+        self.z0 = Some(z0.into());
         Box::new(self)
     }
 
@@ -498,17 +438,19 @@ where
     /// `%{meta[i]}` where `i` is the index or key of the `meta` item in question. To access trace
     /// `meta` in layout attributes, use `%{data[n[.meta[i]}` where `i` is the index or key of the
     /// `meta` and `n` is the trace index.
-    pub fn meta<C: NumOrString>(mut self, meta: C) -> Box<Self> {
-        self.meta = Some(meta.to_num_or_string());
+    pub fn meta<C: Into<private::NumOrString>>(mut self, meta: C) -> Box<Self> {
+        self.meta = Some(meta.into());
         Box::new(self)
     }
 
     /// Assigns extra data each datum. This may be useful when listening to hover, click and
     /// selection events. Note that, "scatter" traces also appends customdata items in the markers
     /// DOM elements
-    pub fn custom_data<C: NumOrString>(mut self, custom_data: Vec<C>) -> Box<Self> {
-        let wrapped = to_num_or_string_wrapper(custom_data);
-        self.custom_data = Some(wrapped);
+    pub fn custom_data<C: Into<private::NumOrString> + Clone>(
+        mut self,
+        custom_data: Vec<C>,
+    ) -> Box<Self> {
+        self.custom_data = Some(custom_data.into());
         Box::new(self)
     }
 
@@ -542,17 +484,6 @@ where
     /// added. Also affects the default value of `fill`.
     pub fn orientation(mut self, orientation: Orientation) -> Box<Self> {
         self.orientation = Some(orientation);
-        Box::new(self)
-    }
-
-    /// Only relevant when `stackgroup` is used, and only the first `groupnorm` found in the
-    /// `stackgroup` will be used - including if `visible` is "legendonly" but not if it is `false`.
-    /// Sets the normalization for the sum of this `stackgroup`. With "fraction", the value of each
-    /// trace at each location is divided by the sum of all trace values at that location. "percent"
-    /// is the same but multiplied by 100 to show percentages. If there are multiple subplots, or
-    /// multiple `stackgroup`s on one subplot, each will be normalized within its own set.
-    pub fn group_norm(mut self, group_norm: GroupNorm) -> Box<Self> {
-        self.group_norm = Some(group_norm);
         Box::new(self)
     }
 
@@ -641,7 +572,7 @@ where
     /// Sets the fill color. Defaults to a half-transparent variant of the line color, marker color,
     /// or marker line color, whichever is available.
     pub fn fill_color<C: Color>(mut self, fill_color: C) -> Box<Self> {
-        self.fill_color = Some(fill_color.to_color());
+        self.fill_color = Some(Box::new(fill_color));
         Box::new(self)
     }
 
@@ -698,14 +629,14 @@ where
 
 impl<X, Y, Z, U, V, W> Trace for Cone<X, Y, Z, U, V, W>
 where
-    X: Serialize + Clone + 'static,
-    Y: Serialize + Clone + 'static,
-    Z: Serialize + Clone + 'static,
-    U: Serialize + Clone + 'static,
-    V: Serialize + Clone + 'static,
-    W: Serialize + Clone + 'static,
+    X: Serialize + Clone,
+    Y: Serialize + Clone,
+    Z: Serialize + Clone,
+    U: Serialize + Clone,
+    V: Serialize + Clone,
+    W: Serialize + Clone,
 {
-    fn serialize(&self) -> String {
-        serde_json::to_string(&self).unwrap()
+    fn to_json(&self) -> String {
+        serde_json::to_string(self).unwrap()
     }
 }

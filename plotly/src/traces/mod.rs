@@ -3,6 +3,7 @@
 mod bar;
 pub mod box_plot;
 mod candlestick;
+pub mod cone;
 pub mod contour;
 pub mod heat_map;
 pub mod histogram;
@@ -16,6 +17,7 @@ pub mod surface;
 pub use bar::Bar;
 pub use box_plot::BoxPlot;
 pub use candlestick::Candlestick;
+pub use cone::Cone;
 pub use contour::Contour;
 pub use heat_map::HeatMap;
 pub use histogram::Histogram;
