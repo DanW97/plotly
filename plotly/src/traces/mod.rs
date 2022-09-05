@@ -4,7 +4,7 @@ mod bar;
 pub mod box_plot;
 mod candlestick;
 pub mod contour;
-mod heat_map;
+pub mod heat_map;
 pub mod histogram;
 mod ohlc;
 pub mod sankey;

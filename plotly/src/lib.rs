@@ -29,7 +29,7 @@ pub use traces::{
     ScatterPolar, Surface,
 };
 // Also provide easy access to modules which contain additional trace-specific types
-pub use traces::{box_plot, contour, histogram, sankey, surface};
+pub use traces::{box_plot, contour, histogram, sankey, surface, heat_map};
 
 #[cfg(feature = "plotly_ndarray")]
 pub use crate::ndarray::ArrayTraces;
