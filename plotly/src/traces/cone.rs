@@ -1,4 +1,8 @@
-//! 3D Scatter plot
+//! Cone plot
+
+#[cfg(feature = "plotly_ndarray")]
+use ndarray::{Array, Ix1};
+use serde::Serialize;
 
 use crate::common::color::{Color, ColorWrapper};
 use crate::common::{
@@ -18,11 +22,26 @@ use ndarray::{Array, Ix1, Ix2, Ix3};
 use crate::ndarray::ArrayTraces;
 
 #[derive(Serialize, Clone, Debug)]
-pub struct Scatter3D<X, Y, Z>
+pub enum Anchor{
+    #[serde(rename = "tip")]
+    Tip,
+    #[serde(rename = "tail")]
+    Tail,
+    #[serde(rename = "cm")]
+    CM,
+    #[serde(rename = "center")]
+    Center,
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct Cone<X, Y, Z, U, V, W>
 where
     X: Serialize + Clone + 'static,
     Y: Serialize + Clone + 'static,
     Z: Serialize + Clone + 'static,
+    U: Serialize + Clone + 'static,
+    V: Serialize + Clone + 'static,
+    W: Serialize + Clone + 'static,
 {
     r#type: PlotType,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,11 +76,15 @@ where
 
     #[serde(skip_serializing_if = "Option::is_none")]
     z: Option<Vec<Z>>,
-
+    #[serde(skip_serializing_if = "Option::is_none", rename = "showscale")]
+    show_scale: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     z0: Option<NumOrStringWrapper>,
     #[serde(skip_serializing_if = "Option::is_none")]
     dz: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    anchor: Option<Anchor>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     text: Option<Dim<String>>,
@@ -125,17 +148,26 @@ where
     y_calendar: Option<Calendar>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "zcalendar")]
     z_calendar: Option<Calendar>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    u: Option<Vec<U>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    v: Option<Vec<V>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    w: Option<Vec<W>>,
 }
 
-impl<X, Y, Z> Default for Scatter3D<X, Y, Z>
+impl<X, Y, Z, U, V, W> Default for Cone<X, Y, Z, U, V, W>
 where
     X: Serialize + Clone + 'static,
     Y: Serialize + Clone + 'static,
     Z: Serialize + Clone + 'static,
+    U: Serialize + Clone + 'static,
+    V: Serialize + Clone + 'static,
+    W: Serialize + Clone + 'static,
 {
     fn default() -> Self {
-        Scatter3D {
-            r#type: PlotType::Scatter3D,
+        Cone {
+            r#type: PlotType::Cone,
             name: None,
             visible: None,
             show_legend: None,
@@ -152,6 +184,11 @@ where
             z: None,
             z0: None,
             dz: None,
+            u: None,
+            v: None,
+            w: None,
+            anchor: None,
+            show_scale: None,
             text: None,
             text_position: None,
             text_template: None,
@@ -186,111 +223,43 @@ where
     }
 }
 
-impl<X, Y, Z> Scatter3D<X, Y, Z>
+impl<X, Y, Z, U, V, W> Cone<X, Y, Z, U, V, W>
 where
     X: Serialize + Clone + 'static,
     Y: Serialize + Clone + 'static,
     Z: Serialize + Clone + 'static,
+    U: Serialize + Clone + 'static,
+    V: Serialize + Clone + 'static,
+    W: Serialize + Clone + 'static,
 {
-    pub fn new<I, J, K>(x: I, y: J, z: K) -> Box<Self>
+    pub fn new<I, J, K, L, M, N>(x: I, y: J, z: K, u: L, v: M, w: N) -> Box<Self>
     where
         I: IntoIterator<Item = X>,
         J: IntoIterator<Item = Y>,
         K: IntoIterator<Item = Z>,
+        L: IntoIterator<Item = U>,
+        M: IntoIterator<Item = V>,
+        N: IntoIterator<Item = W>,
     {
         let x = copy_iterable_to_vec(x);
         let y = copy_iterable_to_vec(y);
         let z = copy_iterable_to_vec(z);
-        Box::new(Scatter3D {
+        let u = copy_iterable_to_vec(u);
+        let v = copy_iterable_to_vec(v);
+        let w = copy_iterable_to_vec(w);
+        Box::new(Cone {
             x: Some(x),
             y: Some(y),
             z: Some(z),
-            r#type: PlotType::Scatter3D,
+            u: Some(u),
+            v: Some(v),
+            w: Some(w),
+            r#type: PlotType::Cone,
             ..Default::default()
         })
     }
 
-    #[cfg(feature = "plotly_ndarray")]
-    pub fn from_array(x: Array<X, Ix1>, y: Array<Y, Ix1>, z: Array<Z, Ix1>) -> Box<Self> {
-        Box::new(Scatter3D {
-            x: Some(x.to_vec()),
-            y: Some(y.to_vec()),
-            z: Some(z.to_vec()),
-            r#type: PlotType::Scatter3D,
-            ..Default::default()
-        })
-    }
-
-    /// Produces `Scatter` traces from a 2 dimensional tensor (`traces_matrix`) indexed by `x`. This
-    /// function requires the `ndarray` feature.
-    ///
-    /// # Arguments
-    /// * `x`             - One dimensional array (or view) that represents the `x` axis coordinates.
-    /// * `traces_matrix` - Two dimensional array (or view) containing the `y` axis coordinates of
-    /// the traces.
-    /// * `array_traces`  - Determines whether the traces are arranged in the matrix over the
-    /// columns (`ArrayTraces::OverColumns`) or over the rows (`ArrayTraces::OverRows`).
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use plotly::common::Mode;
-    /// use plotly::{Plot, Scatter, ArrayTraces};
-    /// use ndarray::{Array, Ix1, Ix2};
-    ///
-    /// fn ndarray_to_traces() {
-    ///     let n: usize = 11;
-    ///     let t: Array<f64, Ix1> = Array::range(0., 10., 10. / n as f64);
-    ///     let mut ys: Array<f64, Ix2> = Array::zeros((11, 11));
-    ///     let mut count = 0.;
-    ///     for mut row in ys.gencolumns_mut() {
-    ///         for index in 0..row.len() {
-    ///             row[index] = count + (index as f64).powf(2.);
-    ///         }
-    ///         count += 1.;
-    ///     }
-    ///
-    ///     let traces = Scatter::default()
-    ///         .mode(Mode::LinesMarkers)
-    ///         .to_traces(t, ys, ArrayTraces::OverColumns);
-    ///
-    ///     let mut plot = Plot::new();
-    ///     plot.add_traces(traces);
-    ///     plot.show();
-    /// }
-    /// fn main() -> std::io::Result<()> {
-    ///     ndarray_to_traces();
-    ///     Ok(())
-    /// }
-    /// ```
-    
-    /*This currently does not work, issue has been raised in plotly repo.
-    For now, this will be left as is because I don't think it's strictly necessary
-    to fix ourselves at this current time*/ 
-    
-    #[cfg(feature = "plotly_ndarray")]
-    pub fn to_traces(
-        &self,
-        x: Array<X, Ix1>,
-        traces_matrix: Array<Y, Ix2>,
-        array_traces: ArrayTraces,
-    ) -> Vec<Box<dyn Trace>> {
-        let mut traces: Vec<Box<dyn Trace>> = Vec::new();
-        let mut trace_vectors = private::trace_vectors_from(traces_matrix, array_traces);
-        trace_vectors.reverse();
-        while !trace_vectors.is_empty() {
-            let mut sc = Box::new(self.clone());
-            sc.x = Some(x.to_vec());
-            let data = trace_vectors.pop();
-            if let Some(d) = data {
-                sc.y = Some(d);
-                traces.push(sc);
-            }
-        }
-
-        traces
-    }
-
+        
     /// Enables WebGL.
     pub fn web_gl_mode(mut self, on: bool) -> Box<Self> {
         self.r#type = if on {
@@ -319,7 +288,13 @@ where
         self.show_legend = Some(show_legend);
         Box::new(self)
     }
-
+    
+    /// Determines whether or not the colorbar is shown
+    pub fn show_scale(mut self, show_scale: bool) -> Box<Self> {
+        self.show_scale = Some(show_scale);
+        Box::new(self)
+    }
+    
     /// Sets the legend group for this trace. Traces part of the same legend group hide/show at the
     /// same time when toggling legend items.
     pub fn legend_group(mut self, legend_group: &str) -> Box<Self> {
@@ -713,13 +688,22 @@ where
         self.z_calendar = Some(z_calendar);
         Box::new(self)
     }
+
+    /// Sets the anchor for the cone with respect to input x, y, z coordinates
+    pub fn anchor(mut self, anchor: Anchor) -> Box<Self> {
+        self.anchor = Some(anchor);
+        Box::new(self)
+    }
 }
 
-impl<X, Y, Z> Trace for Scatter3D<X, Y, Z>
+impl<X, Y, Z, U, V, W> Trace for Cone<X, Y, Z, U, V, W>
 where
     X: Serialize + Clone + 'static,
     Y: Serialize + Clone + 'static,
     Z: Serialize + Clone + 'static,
+    U: Serialize + Clone + 'static,
+    V: Serialize + Clone + 'static,
+    W: Serialize + Clone + 'static,
 {
     fn serialize(&self) -> String {
         serde_json::to_string(&self).unwrap()
