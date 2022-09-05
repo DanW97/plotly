@@ -1,9 +1,14 @@
 use itertools_num::linspace;
-use plotly::common::{
-    ColorScale, ColorScalePalette, DashType, Fill, Font, Line, LineShape, Marker, Mode, Title,
+use plotly::{
+    color::{NamedColor, Rgb, Rgba},
+    common::{
+        ColorScale, ColorScalePalette, DashType, Fill, Font, Line, LineShape, Marker, Mode,
+        Orientation, Title,
+    },
+    layout::{Axis, BarMode, Layout, Legend, TicksDirection, TraceOrder},
+    sankey::{Line as SankeyLine, Link, Node},
+    Bar, Plot, Sankey, Scatter, ScatterPolar,
 };
-use plotly::layout::{Axis, BarMode, Layout, Legend, TicksDirection};
-use plotly::{Bar, NamedColor, Plot, Rgb, Rgba, Scatter};
 use rand_distr::{Distribution, Normal, Uniform};
 
 // Scatter Plots
@@ -23,21 +28,21 @@ fn simple_scatter_plot(show: bool) {
 
 fn line_and_scatter_plots(show: bool) {
     let n: usize = 100;
-    let rng = rand::thread_rng();
+    let mut rng = rand::thread_rng();
     let random_x: Vec<f64> = linspace(0., 1., n).collect();
     let random_y0: Vec<f64> = Normal::new(5., 1.)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(n)
         .collect();
     let random_y1: Vec<f64> = Normal::new(0., 1.)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(n)
         .collect();
     let random_y2: Vec<f64> = Normal::new(-5., 1.)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(n)
         .collect();
 
@@ -80,6 +85,27 @@ fn bubble_scatter_plots(show: bool) {
         plot.show();
     }
     println!("{}", plot.to_inline_html(Some("bubble_scatter_plots")));
+}
+
+fn polar_scatter_plot(show: bool) {
+    let n: usize = 400;
+    let theta: Vec<f64> = linspace(0., 360., n).collect();
+    let r: Vec<f64> = theta
+        .iter()
+        .map(|x| {
+            let x = x / 360. * core::f64::consts::TAU;
+            let x = x.cos();
+            1. / 8. * (63. * x.powf(5.) - 70. * x.powf(3.) + 15. * x).abs()
+        })
+        .collect();
+
+    let trace = ScatterPolar::new(theta, r).mode(Mode::Lines);
+    let mut plot = Plot::new();
+    plot.add_trace(trace);
+    if show {
+        plot.show();
+    }
+    println!("{}", plot.to_inline_html(Some("polar_scatter_plot")));
 }
 
 fn data_labels_hover(show: bool) {
@@ -224,16 +250,11 @@ fn colored_and_styled_scatter_plot(show: bool) {
 
 fn large_data_sets(show: bool) {
     let n: usize = 100_000;
-    let rng = rand::thread_rng();
-    let r: Vec<f64> = Uniform::new(0., 1.).sample_iter(rng).take(n).collect();
+    let mut rng = rand::thread_rng();
+    let r: Vec<f64> = Uniform::new(0., 1.).sample_iter(&mut rng).take(n).collect();
     let theta: Vec<f64> = Normal::new(0., 2. * std::f64::consts::PI)
         .unwrap()
-        .sample_iter(rng)
-        .take(n)
-        .collect();
-    let colors: Vec<f64> = Normal::new(0., 1.)
-        .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(n)
         .collect();
 
@@ -253,7 +274,6 @@ fn large_data_sets(show: bool) {
         .marker(
             Marker::new()
                 .color_scale(ColorScale::Palette(ColorScalePalette::Viridis))
-                .color_array(colors)
                 .line(Line::new().width(1.)),
         );
     let mut plot = Plot::new();
@@ -373,7 +393,7 @@ fn line_shape_options_for_interpolation(show: bool) {
     let layout = Layout::new().legend(
         Legend::new()
             .y(0.5)
-            .trace_order("reversed")
+            .trace_order(TraceOrder::Reversed)
             .font(Font::new().size(16)),
     );
     plot.set_layout(layout);
@@ -383,7 +403,6 @@ fn line_shape_options_for_interpolation(show: bool) {
     plot.add_trace(trace4);
     plot.add_trace(trace5);
     plot.add_trace(trace6);
-    plot.show_png(1024, 680);
     if show {
         plot.show();
     }
@@ -424,7 +443,7 @@ fn line_dash(show: bool) {
         .legend(
             Legend::new()
                 .y(0.5)
-                .trace_order("reversed")
+                .trace_order(TraceOrder::Reversed)
                 .font(Font::new().size(16)),
         )
         .x_axis(Axis::new().range(vec![0.95, 5.05]).auto_range(false))
@@ -589,11 +608,54 @@ fn stacked_bar_chart(show: bool) {
     println!("{}", plot.to_inline_html(Some("stacked_bar_chart")));
 }
 
+// Sankey Diagrams
+fn basic_sankey_diagram(show: bool) {
+    // https://plotly.com/javascript/sankey-diagram/#basic-sankey-diagram
+    let trace = Sankey::new()
+        .orientation(Orientation::Horizontal)
+        .node(
+            Node::new()
+                .pad(15)
+                .thickness(30)
+                .line(SankeyLine::new().color(NamedColor::Black).width(0.5))
+                .label(vec!["A1", "A2", "B1", "B2", "C1", "C2"])
+                .color_array(vec![
+                    NamedColor::Blue,
+                    NamedColor::Blue,
+                    NamedColor::Blue,
+                    NamedColor::Blue,
+                    NamedColor::Blue,
+                    NamedColor::Blue,
+                ]),
+        )
+        .link(
+            Link::new()
+                .value(vec![8, 4, 2, 8, 4, 2])
+                .source(vec![0, 1, 0, 2, 3, 3])
+                .target(vec![2, 3, 3, 4, 4, 5]),
+        );
+
+    let layout = Layout::new()
+        .title("Basic Sankey".into())
+        .font(Font::new().size(10));
+
+    let mut plot = Plot::new();
+    plot.add_trace(trace);
+    plot.set_layout(layout);
+
+    if show {
+        plot.show();
+    }
+
+    println!("{}", plot.to_inline_html(Some("basic_sankey_diagram")));
+}
+
 fn main() -> std::io::Result<()> {
     // Scatter Plots
     simple_scatter_plot(true);
     line_and_scatter_plots(true);
     bubble_scatter_plots(true);
+    polar_scatter_plot(true);
     data_labels_hover(true);
     data_labels_on_the_plot(true);
     colored_and_styled_scatter_plot(true);
@@ -611,5 +673,8 @@ fn main() -> std::io::Result<()> {
     basic_bar_chart(true);
     grouped_bar_chart(true);
     stacked_bar_chart(true);
+
+    // Sankey Diagrams
+    basic_sankey_diagram(true);
     Ok(())
 }

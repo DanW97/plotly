@@ -1,53 +1,23 @@
-<html>
-<head>
-    <meta charset="utf-8"/>
-</head>
-<body>
-<div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script>
-    <script type="text/javascript">if (window.MathJax) {MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>
-    <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
-    {% if remote_plotly_js -%}
-    <script src="https://cdn.plot.ly/plotly-1.54.6.min.js"></script>
-    {% else -%}
-    <script type="text/javascript">{{ plotly_javascript }}</script>
-    {% endif -%}
-    {% if  export_image -%}
-    <div id="plotly-html-element" class="plotly-graph-div" style="height:100%; width:100%;" hidden></div>
-    <div ><img id="image-export" class="plotly-graph-div"></img></div>
-    {% else -%}
-    <div id="plotly-html-element" class="plotly-graph-div" style="height:100%; width:100%;"></div>
-    <div ><img id="image-export" class="plotly-graph-div" hidden></img></div>
-    {% endif -%}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
+            {% if remote_plotly_js -%}
+            <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+            {% else -%}
+            <script type="text/javascript">{% include "plotly.min.js" %}</script>
+            {% endif -%}
 
-    <script type="text/javascript">
-                
-                window.PLOTLYENV=window.PLOTLYENV || {};                    
-                if (document.getElementById("plotly-html-element")) {
+            <div id="plotly-html-element" class="plotly-graph-div" style="height:100%; width:100%;"></div>
 
-                    var d3 = Plotly.d3;
-                    var image_element= d3.select('#image-export');
-
-                    {{ plot_data }}
-
-                    Plotly.newPlot('plotly-html-element', data, layout,
-                        {"responsive": true})
-                        .then(
-                            function(gd) {
-                              Plotly.toImage(gd,{height:{{ image_height }},width:{{ image_width }}})
-                                 .then(
-                                     function(url) {
-                                         if({{ export_image }}) {
-                                             image_element.attr("src", url);
-                                             return Plotly.toImage(gd,{format:'{{ image_type }}',height:{{ image_height }},width:{{ image_width }}});
-                                         }
-                                    })
-                            });
-
-                };
-
-
-    </script>
-</div>
-</body>
+            <script type="module">
+                const graph_div = document.getElementById("plotly-html-element");
+                await Plotly.newPlot(graph_div, {{ plot|tojson|safe }});
+            </script>
+        </div>
+    </body>
 </html>

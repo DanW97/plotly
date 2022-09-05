@@ -1,9 +1,12 @@
 use itertools_num::linspace;
-use plotly::common::{Fill, Font, Mode};
-use plotly::layout::{
-    Axis, GridPattern, Layout, LayoutGrid, Margin, Shape, ShapeLayer, ShapeLine, ShapeType,
+use plotly::{
+    color::NamedColor,
+    common::{DashType, Fill, Font, Mode},
+    layout::{
+        Axis, GridPattern, Layout, LayoutGrid, Margin, Shape, ShapeLayer, ShapeLine, ShapeType,
+    },
+    Bar, Plot, Scatter,
 };
-use plotly::{Bar, NamedColor, Plot, Scatter};
 use rand::thread_rng;
 use rand_distr::{Distribution, Normal};
 
@@ -56,7 +59,7 @@ fn vertical_and_horizontal_lines_positioned_relative_to_axes(show: bool) {
                 ShapeLine::new()
                     .color(NamedColor::LightSeaGreen)
                     .width(3.)
-                    .dash("dashdot"),
+                    .dash(DashType::DashDot),
             ),
     );
     layout.add_shape(
@@ -70,7 +73,7 @@ fn vertical_and_horizontal_lines_positioned_relative_to_axes(show: bool) {
                 ShapeLine::new()
                     .color(NamedColor::MediumPurple)
                     .width(3.)
-                    .dash("dot"),
+                    .dash(DashType::Dot),
             ),
     );
 
@@ -419,35 +422,35 @@ fn circles_positioned_relative_to_the_axes(show: bool) {
 }
 
 fn highlighting_clusters_of_scatter_points_with_circle_shapes(show: bool) {
-    let rng = thread_rng();
+    let mut rng = thread_rng();
     let x0 = Normal::new(2., 0.45)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(300)
         .collect::<Vec<f64>>();
     let y0 = Normal::new(2., 0.45)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(300)
         .collect::<Vec<f64>>();
     let x1 = Normal::new(6., 0.4)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(300)
         .collect::<Vec<f64>>();
     let y1 = Normal::new(6., 0.4)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(300)
         .collect::<Vec<f64>>();
     let x2 = Normal::new(4., 0.3)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(300)
         .collect::<Vec<f64>>();
     let y2 = Normal::new(4., 0.3)
         .unwrap()
-        .sample_iter(rng)
+        .sample_iter(&mut rng)
         .take(300)
         .collect::<Vec<f64>>();
 

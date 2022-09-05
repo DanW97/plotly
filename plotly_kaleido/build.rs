@@ -1,23 +1,30 @@
+extern crate directories;
 extern crate zip;
-use std::env;
-use std::io::Result;
-use std::path::PathBuf;
-use std::process::Command;
 
+use std::env;
 use std::fs;
 use std::io;
+use std::io::Result;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+
+use directories::ProjectDirs;
 
 #[cfg(target_os = "linux")]
 const KALEIDO_URL: &str =
-    "https://github.com/plotly/Kaleido/releases/download/v0.0.1/kaleido_linux-0.0.1.zip";
+    "https://github.com/plotly/Kaleido/releases/download/v0.2.1/kaleido_linux_x64.zip";
 
 #[cfg(target_os = "windows")]
 const KALEIDO_URL: &str =
-    "https://github.com/plotly/Kaleido/releases/download/v0.0.1/kaleido_win-0.0.1.zip";
+    "https://github.com/plotly/Kaleido/releases/download/v0.2.1/kaleido_win_x64.zip";
 
-#[cfg(target_os = "macos")]
+#[cfg(all(target_arch = "x86_64", target_os = "macos"))]
 const KALEIDO_URL: &str =
-    "https://github.com/plotly/Kaleido/releases/download/v0.0.1/kaleido_mac-0.0.1.zip";
+    "https://github.com/plotly/Kaleido/releases/download/v0.2.1/kaleido_mac_x64.zip";
+
+#[cfg(all(target_arch = "aarch64", target_os = "macos"))]
+const KALEIDO_URL: &str =
+    "https://github.com/plotly/Kaleido/releases/download/v0.2.1/kaleido_mac_arm64.zip";
 
 #[cfg(target_os = "linux")]
 const KALEIDO_BIN: &str = "kaleido";
@@ -28,13 +35,13 @@ const KALEIDO_BIN: &str = "kaleido.exe";
 #[cfg(target_os = "macos")]
 const KALEIDO_BIN: &str = "kaleido";
 
-fn extract_zip(p: &PathBuf, zip_file: &PathBuf) -> Result<()> {
+fn extract_zip(p: &Path, zip_file: &Path) -> Result<()> {
     let file = fs::File::open(&zip_file).unwrap();
     let mut archive = zip::ZipArchive::new(file).unwrap();
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).unwrap();
-        let outpath = file.sanitized_name();
+        let outpath = file.mangled_name();
         let outpath = p.join(outpath);
         println!("outpath: {:?}", outpath);
 
@@ -45,7 +52,7 @@ fn extract_zip(p: &PathBuf, zip_file: &PathBuf) -> Result<()> {
             }
         }
 
-        if (&*file.name()).ends_with('/') {
+        if (file.name()).ends_with('/') {
             println!(
                 "File {} extracted to \"{}\"",
                 i,
@@ -84,11 +91,11 @@ fn extract_zip(p: &PathBuf, zip_file: &PathBuf) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let mut dst = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
-    dst = dst.parent().unwrap().to_path_buf();
-    dst = dst.join("plotly_kaleido");
+    let project_dirs = ProjectDirs::from("org", "plotly", "kaleido")
+        .expect("Could not create plotly_kaleido config directory.");
+    let dst: PathBuf = project_dirs.config_dir().into();
 
-    let kaleido_binary = dst.join("kaleido").join("bin").join(KALEIDO_BIN);
+    let kaleido_binary = dst.join("bin").join(KALEIDO_BIN);
     if kaleido_binary.exists() {
         return Ok(());
     }

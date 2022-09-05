@@ -14,17 +14,17 @@
 
 <div align="center">
     <a href="https://github.com/igiagkiozis/plotly/actions">
-        <img src="https://github.com/igiagkiozis/plotly/workflows/build/badge.svg" alt="build status">
+        <img src="https://github.com/igiagkiozis/plotly/workflows/build_master/badge.svg" alt="build status">
     </a>
-    |
     <a href="https://crates.io/crates/plotly">
         <img src="https://img.shields.io/crates/v/plotly.svg" alt="Crates.io">
     </a>
-    |
+    <a href="https://crates.io/crates/plotly">
+        <img src="https://img.shields.io/crates/d/plotly" alt="Downloads">
+    </a>
 	<a href="https://docs.rs/plotly">
         <img src="https://docs.rs/plotly/badge.svg" alt="Documentation">
     </a>
-    |
     <a href="">
         <img src="https://img.shields.io/badge/Minimum%20Rust%20Version-1.31-brightgreen.svg" alt="Minimum Version">
     </a>
@@ -39,7 +39,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-plotly = "0.6.0"
+plotly = "0.8.0"
 ```
 
 For changes since the last version please consult the [change log](https://github.com/igiagkiozis/plotly/blob/master/CHANGELOG.md).
@@ -53,12 +53,15 @@ The following feature flags are available:
 * `plotly_ndarray`
     * Optional, compatible with Rust stable.
     * Adds support for creating plots directly using [ndarray](https://github.com/rust-ndarray/ndarray) types.
+* `wasm`
+    * Optional, compatible with Rust stable.
+    * Adds support for building with wasm-unknown-unknown target triple, enabling use within web development.
 
 Saving to png, jpeg, webp, svg, pdf and eps formats can be made available by enabling the `kaleido` feature: 
 
 ```toml
 [dependencies]
-plotly = { version = "0.6.0", features = ["kaleido"] }
+plotly = { version = "0.8.0", features = ["kaleido"] }
 ```
 For further details please see [plotly_kaleido](https://github.com/igiagkiozis/plotly/tree/master/plotly_kaleido).
 
