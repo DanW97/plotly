@@ -13,8 +13,6 @@ use crate::common::{
 
 use crate::private;
 #[cfg(feature = "plotly_ndarray")]
-use ndarray::{Array, Ix1, Ix2, Ix3};
-#[cfg(feature = "plotly_ndarray")]
 use crate::ndarray::ArrayTraces;
 
 #[derive(Serialize, Clone, Debug)]
