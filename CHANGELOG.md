@@ -1,10 +1,38 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.1] - 2022-XX-XX
+## [0.8.5] - 2023-xx-xx
+### Added
+- [[#153](https://github.com/igiagkiozis/plotly/pull/153)] Added `LayoutScene`
+
+## [0.8.4] - 2023-07-09
+### Added
+- [[#143](https://github.com/igiagkiozis/plotly/pull/143)] Widen version range of `askama`.
+
+### Fixed
+- [[#129](https://github.com/igiagkiozis/plotly/pull/129)] Fix issue for plots not showing in browser in Windows. Thanks to [@juanespj](https://github.com/juanespj) and [@M-NK-Y](https://github.com/M-NK-Y) for the PRs.
+- [[#147](https://github.com/igiagkiozis/plotly/pull/147)] Update documentation for `jupyter notebook` example.
+
+## [0.8.3] - 2022-11-04
+### Fixed
+- [[#122](https://github.com/igiagkiozis/plotly/pull/122)] Compilation error for the `wasm` feature.
+- [[#123](https://github.com/igiagkiozis/plotly/pull/123)] Compilation error for the `plotly_kaleido` feature.
+
+## [0.8.2] - 2022-11-03
+### Added
+- [[#110](https://github.com/igiagkiozis/plotly/pull/110)] `LegendGroupTitle` to existing traces.
+- [[#88](https://github.com/igiagkiozis/plotly/pull/88)] `Mesh3D`, `Image`, `ScatterMapbox` traces.
+
+### Changed
+- [[#113](https://github.com/igiagkiozis/plotly/pull/113)] Refactored the structure of the examples to make them more accessible, whilst adding more examples e.g. for `wasm`.
+- [[#115](https://github.com/igiagkiozis/plotly/pull/115)] Simplify the function signature of Plot.to_inline_html() so that it just takes `Option<&str>` as an argument.
+
+## [0.8.1] - 2022-09-25
+### Added
+- Button support (i.e. [updatemenus](https://plotly.com/javascript/reference/layout/updatemenus/)) contibuted by [@sreenathkrishnan](https://github.com/sreenathkrishnan). Details and examples in this well written PR [#99](https://github.com/igiagkiozis/plotly/pull/99).
+- Internally, there is now a `plotly-derive` crate which defines a `FieldSetter` procedural macro. This massively cuts down the amount of code duplication by generating the setter methods based on the struct fields. Again thanks to @sreenathkrishnan for this effort.
 
 ## [0.8.0] - 2022-08-26
 Version 0.8.0 represents a significant release which refactors a lot of the codebase and tries to provide a cleaner API: there are several breaking changes listed below. On the whole, if migrating from v0.7.0, start by following any new compiler errors and, if you're still stuck, open an issue on the issue tracker and we can help out.

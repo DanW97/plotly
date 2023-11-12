@@ -187,6 +187,7 @@ pub enum PlotType {
     ScatterGL,
     Scatter3D,
     Cone,
+    ScatterMapbox,
     ScatterPolar,
     ScatterPolarGL,
     Bar,
@@ -196,6 +197,8 @@ pub enum PlotType {
     HeatMap,
     Histogram,
     Histogram2dContour,
+    Image,
+    Mesh3D,
     Ohlc,
     Sankey,
     Surface,
@@ -473,6 +476,12 @@ pub enum ColorScale {
     Vector(Vec<ColorScaleElement>),
 }
 
+impl From<ColorScalePalette> for ColorScale {
+    fn from(src: ColorScalePalette) -> Self {
+        ColorScale::Palette(src)
+    }
+}
+
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum LineShape {
@@ -742,6 +751,7 @@ pub struct ColorBar {
     len_mode: Option<ThicknessMode>,
     #[serde(rename = "nticks")]
     n_ticks: Option<usize>,
+    orientation: Option<Orientation>,
     #[serde(rename = "outlinecolor")]
     outline_color: Option<Box<dyn Color>>,
     #[serde(rename = "outlinewidth")]
@@ -841,6 +851,11 @@ impl ColorBar {
 
     pub fn n_ticks(mut self, n_ticks: usize) -> Self {
         self.n_ticks = Some(n_ticks);
+        self
+    }
+
+    pub fn orientation(mut self, orientation: Orientation) -> Self {
+        self.orientation = Some(orientation);
         self
     }
 
@@ -1352,20 +1367,15 @@ impl Label {
     }
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Clone, Debug, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum ErrorType {
+    #[default]
     Percent,
     Constant,
     #[serde(rename = "sqrt")]
     SquareRoot,
     Data,
-}
-
-impl Default for ErrorType {
-    fn default() -> Self {
-        ErrorType::Percent
-    }
 }
 
 #[serde_with::skip_serializing_none]
@@ -1490,7 +1500,8 @@ mod tests {
 
     #[test]
     fn test_serialize_direction() {
-        // TODO: I think `Direction` would be better as a struct, with `fillcolor` and `line` attributes
+        // TODO: I think `Direction` would be better as a struct, with `fillcolor` and
+        // `line` attributes
         let inc = Direction::Increasing { line: Line::new() };
         let expected = json!({"line": {}});
         assert_eq!(to_value(inc).unwrap(), expected);
@@ -1666,6 +1677,7 @@ mod tests {
             .len(99)
             .len_mode(ThicknessMode::Pixels)
             .n_ticks(500)
+            .orientation(Orientation::Horizontal)
             .outline_color("#789456")
             .outline_width(7)
             .separate_thousands(true)
@@ -1706,6 +1718,7 @@ mod tests {
             "len": 99,
             "lenmode": "pixels",
             "nticks": 500,
+            "orientation": "h",
             "outlinecolor": "#789456",
             "outlinewidth": 7,
             "separatethousands": true,

@@ -1,11 +1,13 @@
 //! Contour trace
 
+use plotly_derive::FieldSetter;
 use serde::Serialize;
 
 use crate::{
     color::Color,
     common::{
-        Calendar, ColorBar, ColorScale, Dim, Font, HoverInfo, Label, Line, PlotType, Visible,
+        Calendar, ColorBar, ColorScale, Dim, Font, HoverInfo, Label, LegendGroupTitle, Line,
+        PlotType, Visible,
     },
     private, Trace,
 };
@@ -45,8 +47,9 @@ pub enum Operation {
 }
 
 #[serde_with::skip_serializing_none]
-#[derive(Serialize, Debug, Default, Clone)]
+#[derive(Serialize, Debug, Clone, FieldSetter)]
 pub struct Contours {
+    #[field_setter(skip)]
     r#type: Option<ContoursType>,
     start: Option<f64>,
     end: Option<f64>,
@@ -69,58 +72,8 @@ impl Contours {
         Default::default()
     }
 
-    pub fn coloring(mut self, coloring: Coloring) -> Self {
-        self.coloring = Some(coloring);
-        self
-    }
-
-    pub fn end(mut self, end: f64) -> Self {
-        self.end = Some(end);
-        self
-    }
-
-    pub fn label_font(mut self, label_font: Font) -> Self {
-        self.label_font = Some(label_font);
-        self
-    }
-
-    pub fn label_format(mut self, label_format: &str) -> Self {
-        self.label_format = Some(label_format.to_string());
-        self
-    }
-
-    pub fn operation(mut self, operation: Operation) -> Self {
-        self.operation = Some(operation);
-        self
-    }
-
-    pub fn show_labels(mut self, show_labels: bool) -> Self {
-        self.show_labels = Some(show_labels);
-        self
-    }
-
-    pub fn show_lines(mut self, show_lines: bool) -> Self {
-        self.show_lines = Some(show_lines);
-        self
-    }
-
-    pub fn size(mut self, size: usize) -> Self {
-        self.size = Some(size);
-        self
-    }
-
-    pub fn start(mut self, start: f64) -> Self {
-        self.start = Some(start);
-        self
-    }
-
     pub fn type_(mut self, t: ContoursType) -> Self {
         self.r#type = Some(t);
-        self
-    }
-
-    pub fn value(mut self, value: f64) -> Self {
-        self.value = Some(value);
         self
     }
 }
@@ -166,6 +119,8 @@ where
     show_legend: Option<bool>,
     #[serde(rename = "legendgroup")]
     legend_group: Option<String>,
+    #[serde(rename = "legendgrouptitle")]
+    legend_group_title: Option<LegendGroupTitle>,
     opacity: Option<f64>,
     x: Option<Vec<X>>,
     x0: Option<X>,
@@ -235,6 +190,7 @@ where
             visible: None,
             show_legend: None,
             legend_group: None,
+            legend_group_title: None,
             opacity: None,
             x: None,
             x0: None,
@@ -380,6 +336,11 @@ where
 
     pub fn legend_group(mut self, legend_group: &str) -> Box<Self> {
         self.legend_group = Some(legend_group.to_string());
+        Box::new(self)
+    }
+
+    pub fn legend_group_title(mut self, legend_group_title: LegendGroupTitle) -> Box<Self> {
+        self.legend_group_title = Some(legend_group_title);
         Box::new(self)
     }
 
@@ -622,6 +583,7 @@ mod tests {
             .hover_template_array(vec!["ok {1}", "ok {2}"])
             .hover_text(vec!["p3", "p4"])
             .legend_group("group_1")
+            .legend_group_title(LegendGroupTitle::new("Legend Group Title"))
             .line(Line::new())
             .n_contours(5)
             .name("contour trace")
@@ -659,6 +621,7 @@ mod tests {
             "visible": true,
             "showlegend": false,
             "legendgroup": "group_1",
+            "legendgrouptitle": {"text": "Legend Group Title"},
             "opacity": 0.6,
             "text": ["p1", "p2"],
             "hovertext": ["p3", "p4"],
