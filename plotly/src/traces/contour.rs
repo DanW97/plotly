@@ -53,7 +53,7 @@ pub struct Contours {
     r#type: Option<ContoursType>,
     start: Option<f64>,
     end: Option<f64>,
-    size: Option<usize>,
+    size: Option<f64>,
     coloring: Option<Coloring>,
     #[serde(rename = "showlines")]
     show_lines: Option<bool>,
@@ -519,7 +519,7 @@ mod tests {
             .type_(ContoursType::Levels)
             .start(0.0)
             .end(10.0)
-            .size(5)
+            .size(5.0)
             .coloring(Coloring::HeatMap)
             .show_lines(true)
             .show_labels(false)
@@ -532,7 +532,7 @@ mod tests {
             "type": "levels",
             "start": 0.0,
             "end": 10.0,
-            "size": 5,
+            "size": 5.0,
             "coloring": "heatmap",
             "showlines": true,
             "showlabels": false,
